@@ -1,0 +1,39 @@
+import cv2
+import numpy as np
+
+# Load the video using your provided path
+cap = cv2.VideoCapture(r"C:\Users\sanja\Downloads\Video -1.mp4")
+
+# Define the source and destination points for perspective transformation
+# Make sure to adjust these based on the actual region of interest in your video
+pts1 = np.float32([[100, 100], [400, 100], [100, 400], [400, 400]])
+pts2 = np.float32([[0, 0], [300, 0], [0, 300], [300, 300]])
+
+# Get the perspective transformation matrix
+M = cv2.getPerspectiveTransform(pts1, pts2)
+
+while cap.isOpened():
+    ret, frame = cap.read()
+    if not ret:
+        break
+
+    # Convert each frame to grayscale
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+    # Apply the perspective warp
+    transformed = cv2.warpPerspective(gray, M, (300, 300))
+
+    # Optional: Apply edge detection
+    edges = cv2.Canny(transformed, 30, 100)
+
+    # Display the results
+    cv2.imshow('Original Frame (Grayscale)', gray)
+    cv2.imshow('Perspective Transformed Frame', transformed)
+    cv2.imshow('Canny Edges after Perspective Transformation', edges)
+
+    # Break on pressing 'q'
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
+
+cap.release()
+cv2.destroyAllWindows()
